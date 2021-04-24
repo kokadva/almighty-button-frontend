@@ -3,9 +3,14 @@ language: node_js
 node_js:
   - 10
 
+services:
+  - docker
 
-before_script:
-  - gem install dpl
 
 script:
-  - dpl --skip-cleanup --provider=heroku --app=almighty-button-frontend --api-key=fd59aea8-e264-499a-9986-bff31129b165
+  - docker login --username=_ --password=fd59aea8-e264-499a-9986-bff31129b165 registry.heroku.com
+  - docker build -t almighty-button/almighty-button-frontend:latest .
+  - docker tag almighty-button/almighty-button-frontend:latest registry.heroku.com/almighty-button-frontend/web
+  - docker push registry.heroku.com/almighty-button-frontend/web
+  - docker run --rm -e HEROKU_API_KEY=fd59aea8-e264-499a-9986-bff31129b165  wingrunr21/alpine-heroku-cli container:release web --app almighty-button-frontend
+
